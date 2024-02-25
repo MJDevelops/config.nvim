@@ -1,4 +1,4 @@
 return {
 	"rust-lang/rust.vim",
-	ft = { "rust", "toml" },
+	ft = { "rust" },
 }
