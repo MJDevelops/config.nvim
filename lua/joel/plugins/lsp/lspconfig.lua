@@ -126,6 +126,8 @@ return {
 		lspconfig["clangd"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
+			filetypes = { "c", "cpp", "objc", "objcpp" },
+			single_file_support = true,
 		})
 
 		-- configure lua server (with special settings)
