@@ -3,6 +3,7 @@ return {
 	config = function()
 		require("lint").linters_by_ft = {
 			lua = { "luac" },
+			python = { "pylint" },
 			typescript = { "eslint_d" },
 			typescriptreact = { "eslint_d" },
 			javascript = { "eslint_d" },

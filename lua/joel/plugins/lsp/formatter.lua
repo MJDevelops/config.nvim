@@ -50,21 +50,25 @@ return {
 					end,
 				},
 
-                typescript = {
-                    require("formatter.filetypes.typescript").prettier,
-                },
+				typescript = {
+					require("formatter.filetypes.typescript").prettier,
+				},
 
-                typescriptreact = {
-                    require("formatter.filetypes.typescript").prettier,
-                },
+				typescriptreact = {
+					require("formatter.filetypes.typescript").prettier,
+				},
 
-                javascript = {
-                    require("formatter.filetypes.typescript").prettier,
-                },
+				javascript = {
+					require("formatter.filetypes.typescript").prettier,
+				},
 
-                javascriptreact = {
-                    require("formatter.filetypes.typescript").prettier,
-                },
+				javascriptreact = {
+					require("formatter.filetypes.typescript").prettier,
+				},
+
+				python = {
+					require("formatter.filetypes.python").autopep8,
+				},
 
 				-- Use the special "*" filetype for defining formatter configurations on
 				-- any filetype
