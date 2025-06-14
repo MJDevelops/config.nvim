@@ -7,20 +7,24 @@ from sys import executable, exit
 from importlib import import_module
 from pathlib import Path
 
+
 def install_import(package: str):
     """Dynamically imports pip modules and installs them if they not exists"""
     pkg = None
     try:
         import_module(package)
     except ImportError:
-        run([executable, "-m", "pip", "install", package, "--break-system-packages"], check=True)
+        run([executable, "-m", "pip", "install", package,
+            "--break-system-packages"], check=True)
     finally:
         pkg = import_module(package)
     return pkg
 
+
 distro = install_import("distro")
 shellingham = install_import("shellingham")
 home = Path.home()
+
 
 def install_nvim(sys_name: str):
     """Identifies system and installs neovim"""
@@ -33,7 +37,8 @@ def install_nvim(sys_name: str):
 
         if path.isdir(install_path):
             while True:
-                proceed = input(f"There already is a directory at {install_path}. Replace and proceed? (y, n)").lower()
+                proceed = input(
+                    f"There already is a directory at {install_path}. Replace and proceed? (y, n)").lower()
                 if proceed == "y":
                     rmtree(install_path)
                     break
@@ -56,6 +61,7 @@ def install_nvim(sys_name: str):
             f.write(f"\nexport PATH=\"$PATH:{install_path}/bin\"")
 
         print("\nRestart shell to use nvim.")
+
 
 def install_git(sys_name: str):
     """Identifies system and installs git"""
@@ -82,7 +88,8 @@ def install_git(sys_name: str):
     elif sys_name == "Darwin":
         # Install homebrew if not installed
         if which("brew") is None:
-            run(["NONINTERACTIVE=1", "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""], check=True)
+            run(["NONINTERACTIVE=1", "/bin/bash", "-c",
+                "\"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""], check=True)
         run(["brew", "install", "git"], check=True)
 
 
