@@ -18,11 +18,13 @@ def install_import(package: str):
         pkg = import_module(package)
     return pkg
 
+distro = install_import("distro")
+shellingham = install_import("shellingham")
+home = Path.home()
 
 def install_nvim(sys_name: str):
     """Identifies system and installs neovim"""
     if sys_name in ["Darwin", "Linux"]:
-        home = Path.home()
         arch = machine()
         plat = "linux" if sys_name == "Linux" else "macos"
         arch = "arm64" if arch == "aarch64" else arch
@@ -44,7 +46,6 @@ def install_nvim(sys_name: str):
         run(["sudo", "tar", "-C", "/opt", "-xzf", file], check=True)
         run(["rm", file], check=True)
 
-        shellingham = install_import("shellingham")
         rc_path = ""
         s = shellingham.detect_shell()
 
@@ -60,7 +61,6 @@ def install_nvim(sys_name: str):
 def install_git(sys_name: str):
     """Identifies system and installs git"""
     if sys_name == "Linux":
-        distro = install_import("distro")
         distro_name = distro.id()
         if distro_name in ["debian", "ubuntu"]:
             run(["apt-get", "install", "git"], check=True)
@@ -76,7 +76,6 @@ def install_git(sys_name: str):
 
 def main():
     """Main function"""
-    home = Path.home()
     nvim_dir = path.join(home, ".config", "nvim")
     rust_path = path.join(home, ".cargo")
     sys_name = system()
