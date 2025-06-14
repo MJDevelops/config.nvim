@@ -31,7 +31,7 @@ def install_nvim(sys_name: str):
 
         if path.isdir(install_path):
             while True:
-                proceed = input(f"There already is a directory at {install_path}. Replace and proceed? (y, n)")
+                proceed = input(f"There already is a directory at {install_path}. Replace and proceed? (y, n)").lower()
                 if proceed == "y":
                     rmtree(install_path)
                     break
