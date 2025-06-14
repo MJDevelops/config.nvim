@@ -1,4 +1,4 @@
-from subprocess import run, check_call
+from subprocess import run
 from os import path
 from platform import system, machine
 from shutil import rmtree, which
@@ -6,13 +6,46 @@ from sys import executable
 from importlib import import_module
 from pathlib import Path
 
-def install_import(package):
+
+def install_import(package: str):
     try:
         import_module(package)
     except ImportError:
-        check_call([executable, "-m", "pip", "install", package])
+        run([executable, "-m", "pip", "install", package], check=True)
     finally:
         globals()[package] = import_module(package)
+
+
+def install_nvim(sys_name: str):
+    if sys_name in ["Darwin", "Linux"]:
+        arch = machine()
+        plat = "linux" if sys_name == "Linux" else "macos"
+        arch = "arm64" if arch == "aarch64" else arch
+        file = f"nvim-{plat}-{arch}.tar.gz"
+        run(["curl", "-LO",
+            f"https://github.com/neovim/neovim/releases/latest/download/{file}"], check=True)
+        run(["sudo", "rm", "-rf", "/opt/nvim"], check=True)
+        run(["sudo", "tar", "-C", "/opt", "-xzf", file], check=True)
+        run(["rm", file], check=True)
+
+
+def install_git(sys_name: str):
+    if sys_name == "Linux":
+        install_import("distro")
+        distro_name = distro.id()
+        if distro_name in ["debian", "ubuntu"]:
+            run(["apt-get", "install", "git"], check=True)
+        elif distro_name == "fedora":
+            manager = "dnf"
+            if int(distro.major_version()) <= 21:
+                manager = "yum"
+            run([manager, "install", "git"], check=True)
+    elif sys_name == "Darwin":
+        # Install homebrew if not installed
+        if which("brew") is None:
+            run(["NONINTERACTIVE=1", "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""], check=True)
+        run(["brew", "install", "git"], check=True)
+
 
 def main():
     home = Path.home()
@@ -22,7 +55,8 @@ def main():
 
     if path.isdir(nvim_dir):
         while True:
-            proceed = input(f"There already is a nvim configuration at {nvim_dir}. Replace and continue? (y, n)\n").lower()
+            proceed = input(
+                f"There already is a nvim configuration at {nvim_dir}. Replace and continue? (y, n)\n").lower()
             if proceed == "y":
                 rmtree(nvim_dir)
                 break
@@ -31,42 +65,23 @@ def main():
 
     # Install neovim if not installed
     if which("nvim") is None:
-        if sys_name == "Linux" or sys_name == "Darwin":
-            arch = machine()
-            plat = "linux" if sys_name == "Linux" else "macos"
-            arch = "arm64" if arch == "aarch64" else arch
-            file = f"nvim-{plat}-{arch}.tar.gz"
-            run(["curl", "-LO", f"https://github.com/neovim/neovim/releases/latest/download/{file}"])
-            run(["sudo", "rm", "-rf", "/opt/nvim"])
-            run(["sudo", "tar", "-C", "/opt", "-xzf", file])
-            run(["rm", file])
-
+        print("nvim not found, installing...\n")
+        install_nvim(sys_name)
 
     # install git if not installed
     if which("git") is None:
         print("git not found, installing git...\n")
-        if sys_name == "Linux":
-            install_import("distro")
-            distro_name = distro.id()
-            if distro_name == "ubuntu" or distro_name == "debian":
-                run(["apt-get", "install", "git"])
-            elif distro_name == "fedora":
-                manager = "dnf"
-                if int(distro.major_version()) <= 21:
-                    manager = "yum"
-                run([manager, "install", "git"])
-        elif sys_name == "Darwin":
-            # Install homebrew if not installed
-            if which("brew") is None:
-                run(["NONINTERACTIVE=1", "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""])
-            run(["brew", "install", "git"])
+        install_git(sys_name)
 
-    run(["git", "clone", "https://github.com/MJDevelops/config.nvim.git", nvim_dir])
+    run(["git", "clone", "https://github.com/MJDevelops/config.nvim.git",
+        nvim_dir], check=True)
 
     # Install Rust
     if not path.isdir(rust_path):
         if sys_name == "Linux":
-            run(["curl", "--proto", "'=https'", "--tlsv1.2", "-sSf", "https://sh.rustup.rs", "|", "sh", "-s", "--", "-y"])
+            run(["curl", "--proto", "'=https'", "--tlsv1.2", "-sSf",
+                "https://sh.rustup.rs", "|", "sh", "-s", "--", "-y"], check=True)
+
 
 if __name__ == '__main__':
     main()
