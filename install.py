@@ -1,4 +1,5 @@
-from subprocess import run
+"""Configures neovim on the system"""
+from subprocess import run, Popen, PIPE
 from os import path
 from platform import system, machine
 from shutil import rmtree, which
@@ -6,18 +7,22 @@ from sys import executable
 from importlib import import_module
 from pathlib import Path
 
-
 def install_import(package: str):
+    """Dynamically imports pip modules and installs them if they not exists"""
+    pkg = None
     try:
         import_module(package)
     except ImportError:
-        run([executable, "-m", "pip", "install", package], check=True)
+        run([executable, "-m", "pip", "install", package, "--break-system-packages"], check=True)
     finally:
-        globals()[package] = import_module(package)
+        pkg = import_module(package)
+    return pkg
 
 
 def install_nvim(sys_name: str):
+    """Identifies system and installs neovim"""
     if sys_name in ["Darwin", "Linux"]:
+        home = Path.home()
         arch = machine()
         plat = "linux" if sys_name == "Linux" else "macos"
         arch = "arm64" if arch == "aarch64" else arch
@@ -28,10 +33,22 @@ def install_nvim(sys_name: str):
         run(["sudo", "tar", "-C", "/opt", "-xzf", file], check=True)
         run(["rm", file], check=True)
 
+        shellingham = install_import("shellingham")
+        rc_path = ""
+        s = shellingham.detect_shell()
+
+        if s[0] == "bash":
+            rc_path = path.join(home, ".bashrc")
+
+        with open(rc_path, "a", encoding="utf-8") as f:
+            f.write(f"\nexport PATH=\"$PATH:/opt/nvim/{file[:-7]}/bin\"")
+        run(["source", rc_path], check=True)
+
 
 def install_git(sys_name: str):
+    """Identifies system and installs git"""
     if sys_name == "Linux":
-        install_import("distro")
+        distro = install_import("distro")
         distro_name = distro.id()
         if distro_name in ["debian", "ubuntu"]:
             run(["apt-get", "install", "git"], check=True)
@@ -46,6 +63,7 @@ def install_git(sys_name: str):
 
 
 def main():
+    """Main function"""
     home = Path.home()
     nvim_dir = path.join(home, ".config", "nvim")
     rust_path = path.join(home, ".cargo")
@@ -77,8 +95,9 @@ def main():
     # Install Rust
     if not path.isdir(rust_path):
         if sys_name == "Linux":
-            run(["curl", "--proto", "'=https'", "--tlsv1.2", "-sSf",
-                "https://sh.rustup.rs", "|", "sh", "-s", "--", "-y"], check=True)
+            p1 = Popen(["curl", "https://sh.rustup.rs"], stdout=PIPE)
+            Popen(["sh", "-s", "--", "-y"], stdin=p1.stdout)
+            p1.stdout.close()
 
 
 if __name__ == '__main__':
