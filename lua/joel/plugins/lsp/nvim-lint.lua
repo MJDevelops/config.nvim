@@ -10,7 +10,7 @@ return {
 			javascriptreact = { "eslint_d" },
 		}
 
-		vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPre" }, {
+		vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPre", "BufEnter" }, {
 			callback = function()
 				require("lint").try_lint()
 			end,
