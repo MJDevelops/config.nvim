@@ -41,8 +41,9 @@ def install_nvim(sys_name: str):
             rc_path = path.join(home, ".bashrc")
 
         with open(rc_path, "a", encoding="utf-8") as f:
-            f.write(f"\nexport PATH=\"$PATH:/opt/nvim/{file[:-7]}/bin\"")
-        run(["source", rc_path], check=True)
+            f.write(f"\nexport PATH=\"$PATH:/opt/{file[:-7]}/bin\"")
+
+        print("\nRestart shell to use nvim.")
 
 
 def install_git(sys_name: str):
