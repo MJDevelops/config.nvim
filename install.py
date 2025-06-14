@@ -57,16 +57,28 @@ def install_nvim(sys_name: str):
 
         print("\nRestart shell to use nvim.")
 
-
 def install_git(sys_name: str):
     """Identifies system and installs git"""
     if sys_name == "Linux":
         distro_name = distro.id()
         if distro_name in ["debian", "ubuntu"]:
+            if distro_name == "ubuntu":
+                run(["add-apt-repository", "ppa:git-core/ppa"], check=True)
+                run(["apt", "update"], check=True)
             run(["apt-get", "install", "git"], check=True)
         elif distro_name == "fedora":
             manager = "yum" if int(distro.major_version()) <= 21 else "dnf"
             run([manager, "install", "git"], check=True)
+        elif distro_name == "arch":
+            run(["pacman", "-S", "git"], check=True)
+        elif distro_name == "gentoo":
+            run(["emerge", "--ask", "--verbose", "dev-vcs/git"], check=True)
+        elif distro_name == "opensuse":
+            run(["zypper", "install", "git"], check=True)
+        elif distro_name == "openbsd":
+            run(["pkg_add", "git"], check=True)
+        elif distro_name == "freebsd":
+            run(["pkg", "install", "git"], check=True)
     elif sys_name == "Darwin":
         # Install homebrew if not installed
         if which("brew") is None:
