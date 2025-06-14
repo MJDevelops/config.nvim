@@ -3,7 +3,7 @@ from subprocess import run, Popen, PIPE
 from os import path
 from platform import system, machine
 from shutil import rmtree, which
-from sys import executable
+from sys import executable, exit
 from importlib import import_module
 from pathlib import Path
 
@@ -27,6 +27,17 @@ def install_nvim(sys_name: str):
         plat = "linux" if sys_name == "Linux" else "macos"
         arch = "arm64" if arch == "aarch64" else arch
         file = f"nvim-{plat}-{arch}.tar.gz"
+        install_path = f"/opt/{file[:-7]}"
+
+        if path.isdir(install_path):
+            while True:
+                proceed = input(f"There already is a directory at {install_path}. Replace and proceed? (y, n)")
+                if proceed == "y":
+                    rmtree(install_path)
+                    break
+                elif proceed == "n":
+                    exit(1)
+
         run(["curl", "-LO",
             f"https://github.com/neovim/neovim/releases/latest/download/{file}"], check=True)
         run(["sudo", "rm", "-rf", "/opt/nvim"], check=True)
@@ -41,7 +52,7 @@ def install_nvim(sys_name: str):
             rc_path = path.join(home, ".bashrc")
 
         with open(rc_path, "a", encoding="utf-8") as f:
-            f.write(f"\nexport PATH=\"$PATH:/opt/{file[:-7]}/bin\"")
+            f.write(f"\nexport PATH=\"$PATH:{install_path}/bin\"")
 
         print("\nRestart shell to use nvim.")
 
@@ -78,7 +89,7 @@ def main():
                 rmtree(nvim_dir)
                 break
             elif proceed == "n":
-                return
+                exit(1)
 
     # Install neovim if not installed
     if which("nvim") is None:
