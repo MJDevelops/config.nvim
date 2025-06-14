@@ -36,9 +36,7 @@ def install_git(sys_name: str):
         if distro_name in ["debian", "ubuntu"]:
             run(["apt-get", "install", "git"], check=True)
         elif distro_name == "fedora":
-            manager = "dnf"
-            if int(distro.major_version()) <= 21:
-                manager = "yum"
+            manager = "yum" if int(distro.major_version()) <= 21 else "dnf"
             run([manager, "install", "git"], check=True)
     elif sys_name == "Darwin":
         # Install homebrew if not installed
