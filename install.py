@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 def install_import(package: str):
-    """Dynamically imports pip modules and installs them if they not exists"""
+    """Dynamically imports pip modules and installs them if they not exist"""
     pkg = None
     try:
         import_module(package)
