@@ -3,7 +3,7 @@ from subprocess import run, Popen, PIPE
 from os import path
 from platform import system, machine
 from shutil import rmtree, which
-from sys import executable, exit
+from sys import executable, exit as sysexit
 from importlib import import_module
 from pathlib import Path
 
@@ -43,7 +43,7 @@ def install_nvim(sys_name: str):
                     rmtree(install_path)
                     break
                 elif proceed == "n":
-                    exit(1)
+                    sysexit(1)
 
         run(["curl", "-LO",
             f"https://github.com/neovim/neovim/releases/latest/download/{file}"], check=True)
@@ -107,7 +107,7 @@ def main():
                 rmtree(nvim_dir)
                 break
             elif proceed == "n":
-                exit(1)
+                sysexit(1)
 
     # Install neovim if not installed
     if which("nvim") is None:
@@ -124,7 +124,7 @@ def main():
 
     # Install Rust
     if not path.isdir(rust_path):
-        if sys_name == "Linux":
+        if sys_name in ["Linux", "Darwin"]:
             p1 = Popen(["curl", "https://sh.rustup.rs"], stdout=PIPE)
             Popen(["sh", "-s", "--", "-y"], stdin=p1.stdout)
             p1.stdout.close()
