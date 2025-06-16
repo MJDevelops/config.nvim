@@ -52,12 +52,18 @@ def install_nvim(sys_name: str):
 
         rc_path = ""
         s = shellingham.detect_shell()
+        cmd = f"\nexport PATH=\"$PATH:{install_path}/bin\""
 
         if s[0] == "bash":
             rc_path = path.join(home, ".bashrc")
+        elif s[0] == "zsh":
+            rc_path = path.join(home, ".zprofile")
+        elif s[0] == "fish":
+            rc_path = path.join(home, ".config", "fish", "config.fish")
+            cmd = f"\nset -U fish_user_paths {install_path}/bin $fish_user_paths"
 
         with open(rc_path, "a", encoding="utf-8") as f:
-            f.write(f"\nexport PATH=\"$PATH:{install_path}/bin\"")
+            f.write(cmd)
 
         print("\nRestart shell to use nvim.")
 
