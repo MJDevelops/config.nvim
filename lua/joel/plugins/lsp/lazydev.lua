@@ -35,7 +35,7 @@ return {
 					},
 				},
 			},
-			fuzzy = { implementation = "prefer_rust" },
+			fuzzy = { implementation = "lua" },
 		},
 	},
 	-- { "folke/neodev.nvim", enabled = false }, -- make sure to uninstall or disable neodev.nvim
