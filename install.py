@@ -1,5 +1,5 @@
 """Configures neovim on the system"""
-from subprocess import run, Popen, PIPE
+from subprocess import DEVNULL, run, Popen, PIPE
 from os import path
 from platform import system, machine
 from shutil import rmtree, which
@@ -14,8 +14,7 @@ def install_import(package: str):
     try:
         import_module(package)
     except ImportError:
-        run([executable, "-m", "pip", "install", package,
-            "--break-system-packages"], check=True)
+        run([executable, "-m", "pip", "install", package], stderr=DEVNULL, stdout=DEVNULL, check=True)
     finally:
         pkg = import_module(package)
     return pkg
