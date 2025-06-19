@@ -46,7 +46,7 @@ return {
 								"-",
 							},
 							stdin = true,
-						}
+				}
 					end,
 				},
 
@@ -69,6 +69,10 @@ return {
 				python = {
 					require("formatter.filetypes.python").autopep8,
 				},
+
+                ruby = {
+                    require("formatter.filetypes.ruby").rubocop,
+                },
 
 				-- Use the special "*" filetype for defining formatter configurations on
 				-- any filetype
