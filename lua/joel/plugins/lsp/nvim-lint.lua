@@ -8,6 +8,7 @@ return {
 			typescriptreact = { "eslint_d" },
 			javascript = { "eslint_d" },
 			javascriptreact = { "eslint_d" },
+			ruby = { "rubocop" },
 		}
 
 		vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPre", "BufEnter" }, {
